@@ -56,7 +56,7 @@ build_flags =
 
 Here's a diagram to help you understand how all the pieces fit together between the phone app, the ESP8266 app, the MQTT server, and Home Assistant Server.
 
-![Diagram](Blynk-Home-Assistant/Blynk-Server-Diagram.jpg)
+![Diagram](https://github.com/ptcryan/Blynk-Home-Assistant/blob/master/Blynk-Server-Diagram.jpg)
 
 ### Using Automations to Send/Receive MQTT Messages
 

@@ -56,7 +56,7 @@ build_flags =
 
 Here's a diagram to help you understand how all the pieces fit together between the phone app, the ESP8266 app, the MQTT server, and Home Assistant Server.
 
-![Diagram](https://github.com/ptcryan/Blynk-Home-Assistant/blob/master/Blynk-Server-Diagram.jpg)
+![Diagram](Blynk-Home-Assistant/Blynk-Server-Diagram.jpg)
 
 ### Using Automations to Send/Receive MQTT Messages
 
@@ -93,8 +93,8 @@ You'll need one of these sets of automations for each lamp, switch, sensor, etc.
 
 Blynk Home Assistant uses:
 
-[PubSubClient](https://github.com/knolleary/pubsubclient) - Arduino library for pubhlishing & subscribing to MQTT messages.
-[Blynk-library](https://github.com/blynkkk/blynk-library/releases/latest) - Arduino library for interfacing to a Blynk server.
+[PubSubClient](https://github.com/knolleary/pubsubclient) - Arduino library for pubhlishing & subscribing to MQTT messages.  
+[Blynk-library](https://github.com/blynkkk/blynk-library/releases/latest) - Arduino library for interfacing to a Blynk server.  
 [Platformio](https://platformio.org) - An open source ecosystem for IoT development
 
 ## License

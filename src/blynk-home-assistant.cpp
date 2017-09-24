@@ -98,7 +98,7 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
     }
   }
 
-  if (String("home/kitchen/wemo/status").equals(p_topic)) {
+  if (String("home/main_floor/kitchen/sink_lights/status").equals(p_topic)) {
     if (payload.equals(String("on"))) {
       Blynk.virtualWrite(V3, HIGH);
       Serial.println("Set V3 HIGH");
@@ -154,9 +154,9 @@ BLYNK_WRITE(V2) {
 BLYNK_WRITE(V3) {
   int pinData = param.asInt();
   if (pinData == 0) {
-    client.publish("home/kitchen/wemo/set", "off");
+    client.publish("home/main_floor/kitchen/sink_lights/set", "off");
   } else {
-    client.publish("home/kitchen/wemo/set", "on");
+    client.publish("home/main_floor/kitchen/sink_lights/set", "on");
   }
 }
 
@@ -194,7 +194,7 @@ void reconnect() {
       client.subscribe("home/right_door/status");
       client.subscribe("home/left_door/status");
       client.loop(); // recommended to loop() by author. https://github.com/knolleary/pubsubclient/issues/98
-      client.subscribe("home/kitchen/wemo/status");
+      client.subscribe("home/main_floor/kitchen/sink_lights/status");
       client.subscribe("home/main_floor/den/desk_lamp/status");
       client.loop(); // recommended to loop() by author. https://github.com/knolleary/pubsubclient/issues/98
       client.subscribe("home/main_floor/den/desk_lamp/bright/status");

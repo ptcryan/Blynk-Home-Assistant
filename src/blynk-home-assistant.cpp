@@ -28,17 +28,24 @@ SOFTWARE.
 #include <PubSubClient.h>
 #include <ArduinoOTA.h>
 #include <BlynkSimpleEsp8266.h>
+#include <SimpleTimer.h>
 
 void HandleClients(void);
 
 void callback(char* p_topic, byte* p_payload, unsigned int p_length);
 void reconnect(void);
 void HandleClients(void);
+void toggleLED(void);
 void setup(void);
 void loop(void);
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 #define MAX_SRV_CLIENTS 1
+
+// create a timer object
+SimpleTimer timer;
+
+int ledState = LOW;
 
 // onboard LED
 const int STATUS_LED = 0;
@@ -58,6 +65,11 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
     payload.concat((char)p_payload[i]);
   }
 
+  Serial.print("Got a message on ");
+  Serial.println(p_topic);
+  Serial.print("Payload is ");
+  Serial.println(payload.c_str());
+
   if (String("hass/lamp2/status").equals(p_topic)) {
     if (payload.equals(String("ON"))) {
       Blynk.virtualWrite(V0, HIGH);
@@ -67,10 +79,6 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
   }
 
   if (String("home/right_door/status").equals(p_topic)) {
-    Serial.print("Got a message on ");
-    Serial.println(p_topic);
-    Serial.print("Payload is ");
-    Serial.println(payload.c_str());
     if (payload.equals(String("on"))) {
       Blynk.setProperty(V1, "offLabel", "DOOR IS OPEN");
       Serial.println("Setting V1 label to DOOR IS OPEN");
@@ -81,10 +89,6 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
   }
 
   if (String("home/left_door/status").equals(p_topic)) {
-    Serial.print("Got a message on ");
-    Serial.println(p_topic);
-    Serial.print("Payload is ");
-    Serial.println(payload.c_str());
     if (payload.equals(String("on"))) {
       Blynk.setProperty(V2, "offLabel", "DOOR IS OPEN");
       Serial.println("Setting V2 label to DOOR IS OPEN");
@@ -104,7 +108,7 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
     }
   }
 
-  if (String("home/desk/status").equals(p_topic)) {
+  if (String("home/main_floor/den/desk_lamp/status").equals(p_topic)) {
     if (payload.equals(String("on"))) {
       Blynk.virtualWrite(V4, HIGH);
       Serial.println("Set V4 HIGH");
@@ -114,7 +118,7 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
     }
   }
 
-  if (String("home/desk/bright/status").equals(p_topic)) {
+  if (String("home/main_floor/den/desk_lamp/bright/status").equals(p_topic)) {
     if (payload == NULL)  {
       payload = "0";
     }
@@ -158,16 +162,18 @@ BLYNK_WRITE(V3) {
 
 BLYNK_WRITE(V4) {
   int pinData = param.asInt();
+  String payload;
   if (pinData == 0) {
-    client.publish("home/desk/set", "off");
+    payload = "off";
   } else {
-    client.publish("home/desk/set", "on");
+    payload = "on";
   }
+  client.publish("home/main_floor/den/desk_lamp/set", payload.c_str());
 }
 
 BLYNK_WRITE(V5) {
   const char* pinData = param.asStr();
-  client.publish("home/desk/bright/set", pinData);
+  client.publish("home/main_floor/den/desk_lamp/bright/set", pinData);
 }
 
 BLYNK_CONNECTED() {
@@ -189,9 +195,9 @@ void reconnect() {
       client.subscribe("home/left_door/status");
       client.loop(); // recommended to loop() by author. https://github.com/knolleary/pubsubclient/issues/98
       client.subscribe("home/kitchen/wemo/status");
-      client.subscribe("home/desk/status");
+      client.subscribe("home/main_floor/den/desk_lamp/status");
       client.loop(); // recommended to loop() by author. https://github.com/knolleary/pubsubclient/issues/98
-      client.subscribe("home/desk/bright/status");
+      client.subscribe("home/main_floor/den/desk_lamp/bright/status");
     } else {
       Serial.print("ERROR: failed, rc=");
       Serial.print(client.state());
@@ -249,9 +255,21 @@ void HandleClients(void) {
   }
 }
 
+void toggleLED() {
+  if (ledState == LOW) {
+    ledState = HIGH;
+  } else {
+    ledState = LOW;
+  }
+  digitalWrite(STATUS_LED, ledState);
+}
+
 void setup() {
 
   pinMode(STATUS_LED, OUTPUT);
+  // toggle status LED
+  timer.setInterval(500, toggleLED);
+
 
   Serial.begin(115200);
   Serial.println("\nBooting");
@@ -334,23 +352,9 @@ void loop() {
     reconnect();
   }
 
-  static unsigned long ledTime = millis();
-  static int ledState = LOW;
-
-  // toggle status LED
-  if (millis() - ledTime > 500) {
-    if (ledState == LOW) {
-      ledState = HIGH;
-    } else {
-      ledState = LOW;
-    }
-    digitalWrite(STATUS_LED, ledState);
-    ledTime = millis();
-//    Serial.print(".");
-  }
-
   HandleClients();
   ArduinoOTA.handle();
   client.loop();
+  timer.run();
   Blynk.run();
 }

@@ -126,6 +126,82 @@ void callback(char* p_topic, byte* p_payload, unsigned int p_length) {
     Serial.println(payload);
     Blynk.virtualWrite(V5, payload);
   }
+
+  if (String("home/main_floor/den/overhead_lights/status").equals(p_topic)) {
+    if (payload.equals(String("on"))) {
+      Blynk.virtualWrite(V6, HIGH);
+      Serial.println("Set V6 HIGH");
+    } else {
+      Blynk.virtualWrite(V6, LOW);
+      Serial.println("Set V6 LOW");
+    }
+  }
+
+  if (String("home/main_floor/den/overhead_lights/bright/status").equals(p_topic)) {
+    if (payload == NULL)  {
+      payload = "0";
+    }
+    Serial.print("Setting overhead lights brightness to ");
+    Serial.println(payload);
+    Blynk.virtualWrite(V7, payload);
+  }
+
+  if (String("home/main_floor/dining_room/overhead_lights/status").equals(p_topic)) {
+    if (payload.equals(String("on"))) {
+      Blynk.virtualWrite(V8, HIGH);
+      Serial.println("Set V8 HIGH");
+    } else {
+      Blynk.virtualWrite(V8, LOW);
+      Serial.println("Set V8 LOW");
+    }
+  }
+
+  if (String("home/main_floor/dining_room/overhead_lights/bright/status").equals(p_topic)) {
+    if (payload == NULL)  {
+      payload = "0";
+    }
+    Serial.print("Setting overhead lights brightness to ");
+    Serial.println(payload);
+    Blynk.virtualWrite(V9, payload);
+  }
+
+  if (String("home/main_floor/living_room/living_room/status").equals(p_topic)) {
+    if (payload.equals(String("on"))) {
+      Blynk.virtualWrite(V10, HIGH);
+      Serial.println("Set V10 HIGH");
+    } else {
+      Blynk.virtualWrite(V10, LOW);
+      Serial.println("Set V10 LOW");
+    }
+  }
+
+  if (String("home/main_floor/living_room/living_room/bright/status").equals(p_topic)) {
+    if (payload == NULL)  {
+      payload = "0";
+    }
+    Serial.print("Setting overhead lights brightness to ");
+    Serial.println(payload);
+    Blynk.virtualWrite(V11, payload);
+  }
+
+  if (String("home/main_floor/living_room/living_room_fan_lights/status").equals(p_topic)) {
+    if (payload.equals(String("on"))) {
+      Blynk.virtualWrite(V12, HIGH);
+      Serial.println("Set V12 HIGH");
+    } else {
+      Blynk.virtualWrite(V12, LOW);
+      Serial.println("Set V12 LOW");
+    }
+  }
+
+  if (String("home/main_floor/living_room/living_room_fan_lights/bright/status").equals(p_topic)) {
+    if (payload == NULL)  {
+      payload = "0";
+    }
+    Serial.print("Setting overhead lights brightness to ");
+    Serial.println(payload);
+    Blynk.virtualWrite(V13, payload);
+  }
 }
 
 BLYNK_WRITE(V0) {
@@ -176,6 +252,70 @@ BLYNK_WRITE(V5) {
   client.publish("home/main_floor/den/desk_lamp/bright/set", pinData);
 }
 
+BLYNK_WRITE(V6) {
+  int pinData = param.asInt();
+  String payload;
+  if (pinData == 0) {
+    payload = "off";
+  } else {
+    payload = "on";
+  }
+  client.publish("home/main_floor/den/overhead_lights/set", payload.c_str());
+}
+
+BLYNK_WRITE(V7) {
+  const char* pinData = param.asStr();
+  client.publish("home/main_floor/den/overhead_lights/bright/set", pinData);
+}
+
+BLYNK_WRITE(V8) {
+  int pinData = param.asInt();
+  String payload;
+  if (pinData == 0) {
+    payload = "off";
+  } else {
+    payload = "on";
+  }
+  client.publish("home/main_floor/dining_room/overhead_lights/set", payload.c_str());
+}
+
+BLYNK_WRITE(V9) {
+  const char* pinData = param.asStr();
+  client.publish("home/main_floor/dining_room/overhead_lights/bright/set", pinData);
+}
+
+BLYNK_WRITE(V10) {
+  int pinData = param.asInt();
+  String payload;
+  if (pinData == 0) {
+    payload = "off";
+  } else {
+    payload = "on";
+  }
+  client.publish("home/main_floor/living_room/living_room/set", payload.c_str());
+}
+
+BLYNK_WRITE(V11) {
+  const char* pinData = param.asStr();
+  client.publish("home/main_floor/living_room/living_room/bright/set", pinData);
+}
+
+BLYNK_WRITE(V12) {
+  int pinData = param.asInt();
+  String payload;
+  if (pinData == 0) {
+    payload = "off";
+  } else {
+    payload = "on";
+  }
+  client.publish("home/main_floor/living_room/living_room_fan_lights/set", payload.c_str());
+}
+
+BLYNK_WRITE(V13) {
+  const char* pinData = param.asStr();
+  client.publish("home/main_floor/living_room/living_room_fan_lights/bright/set", pinData);
+}
+
 BLYNK_CONNECTED() {
   Blynk.syncAll();
 }
@@ -198,6 +338,18 @@ void reconnect() {
       client.subscribe("home/main_floor/den/desk_lamp/status");
       client.loop(); // recommended to loop() by author. https://github.com/knolleary/pubsubclient/issues/98
       client.subscribe("home/main_floor/den/desk_lamp/bright/status");
+      client.subscribe("home/main_floor/den/overhead_lights/status");
+      client.loop();
+      client.subscribe("home/main_floor/den/overhead_lights/bright/status");
+      client.subscribe("home/main_floor/dining_room/overhead_lights/status");
+      client.loop();
+      client.subscribe("home/main_floor/dining_room/overhead_lights/bright/status");
+      client.subscribe("home/main_floor/living_room/living_room/status");
+      client.loop();
+      client.subscribe("home/main_floor/living_room/living_room/bright/status");
+      client.subscribe("home/main_floor/living_room/living_room_fan_lights/status");
+      client.loop();
+      client.subscribe("home/main_floor/living_room/living_room_fan_lights/bright/status");
     } else {
       Serial.print("ERROR: failed, rc=");
       Serial.print(client.state());
@@ -279,44 +431,13 @@ void setup() {
 
   Blynk.begin(_BLYNK_AUTH_TOKEN_, _WIFI_SSID_, _WIFI_PASS_, _BLYNK_SERVER_IP_);
   Serial.println("Start Blynk.connect()");
-  //while (Blynk.connect() == false) {
-	//	delay(10); // Wait until connected
-	//}
 
-//  Serial.print("INFO: Connecting to ");
-//  WiFi.mode(WIFI_STA);
-//  Serial.println(ssid);
-//  WiFi.begin(ssid, password);
-//  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-//    Serial.println("Connection Failed! Rebooting...");
-//    delay(5000);
-//    ESP.restart();
-//  }
   Serial.println("Connected.");
 
-  // Port defaults to 8266
-  // ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
   ArduinoOTA.setHostname(_MQTT_CLIENT_ID_);
-
-  // No authentication by default
-  // ArduinoOTA.setPassword("admin");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
 
   ArduinoOTA.onStart([]() {
     Serial.println("Start");
-    //String type;
-    // if (ArduinoOTA.getCommand() == U_FLASH)
-      // type = "sketch";
-    // else // U_SPIFFS
-      // type = "filesystem";
-
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-    // Serial.println("Start updating " + type);
   });
 
   ArduinoOTA.onEnd([]() {
